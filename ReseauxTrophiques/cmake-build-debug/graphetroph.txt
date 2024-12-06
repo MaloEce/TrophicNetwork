@@ -1,0 +1,32 @@
+// Sommets : liste des espèces ou ressources dans le réseau trophique
+// TYPE : producteur, consommateur primaire, secondaire, décomposeur
+// BIOMASSE : taille de la population ou biomasse en kg
+
+1 "Phytoplancton" producteur  50000  // Base de la chaîne alimentaire, biomasse estimée
+2 "Herbiers marins" producteur 10000 // Algue dense recouvrant les zones peu profondes
+3 "Poisson chirurgien" consommateur 2000 // Consommateur primaire
+4 "Poisson-papillon" consommateur 1500 // Consommateur primaire
+5 "Tortue verte" consommateur 1000 // Consommateur primaire d'algues
+6 "Merou" consommateur 500 // Consommateur secondaire (prédateur intermédiaire)
+7 "Requin tigre" consommateur 50 // Consommateur tertiaire (prédateur au sommet)
+8 "Benitier" filtreur 300 // Dépend du phytoplancton
+9 "Corail" symbiotique 800 // Dépend des algues et de la photosynthèse
+10 "Champignons marins" decomposeur 500 // Recycler les nutriments morts
+
+// Arcs : relations entre les sommets
+// POIDS : influence (positive ou négative) ou proportion des ressources consommées
+
+1 3 0.7  // Phytoplancton nourrit le poisson chirurgien (70%)
+1 4 0.6  // Phytoplancton nourrit le poisson-papillon (60%)
+1 8 0.5  // Phytoplancton consommé par le bénitier (50%)
+2 5 0.8  // Herbiers consommés par la tortue verte (80%)
+3 6 -0.4 // Mérou consomme le poisson chirurgien (40%)
+4 6 -0.3 // Mérou consomme le poisson-papillon (30%)
+6 7 -0.6 // Requin tigre chasse le mérou (60%)
+5 10 0.2 // Tortue verte contribue aux nutriments pour les champignons
+7 10 0.3 // Requin tigre contribue aux nutriments pour les champignons
+9 10 0.1 // Corail nourrit indirectement les décomposeurs (10%)
+10 2 0.2 // Décomposeurs recyclent les nutriments vers les herbiers
+
+
+//connexite, une source dalimentation,
