@@ -1,19 +1,20 @@
 #include "Header.h"
-
 int main() {
     char nomFichier[100];
     printf("Entrez le nom du fichier contenant le reseau trophique : ");
     scanf("%s", nomFichier);
 
     ReseauTrophique *reseau = chargerReseau(nomFichier);
-
-    int choix, choix2;
+    connexite(&reseau);
+//notre menu, comment on passe detape a etape
+        int choix, choix2;
     do {
         printf("\n--- Menu ---\n");
         printf("1. Afficher le reseau trophique\n");
         printf("2. Rechercher les sommets particuliers\n");
         printf("3. Afficher la complexitee du reseau\n");
-        printf("4. Quitter\n");
+        printf("4. Simuler la dynamique des population\n");
+        printf("5. Quitter\n");
         scanf("%d", &choix);
 
         switch (choix) {
@@ -21,7 +22,7 @@ int main() {
                 afficherReseau(reseau);
                 break;
 
-            case 2:
+            case 2: //sous menu pour les sommets particuliers
                 choix=0;
                 do {
                     printf("\n--- Recherche des sommets particuliers ---\n");
@@ -49,26 +50,44 @@ int main() {
                             break;
 
                         case 5:
+
                             break;
 
                         default:
-                            printf("Choix invalide. Reessayez.\n");
+                            printf("Choix invalide, reessayez.\n");
                     }
                 }while(choix2!=5);
+                break;
 
             case 3:
                 afficherComplexite(reseau);
                 break;
 
             case 4:
+                printf("Simulation de la dynamique des populations\n");
+
+                int iterations;
+                float r;
+
+                printf("Entrez le nombre d'iterations  : ");// envoi des variables pour la dyna, jaurai pu les demander apres
+                scanf("%d", &iterations);
+
+                printf("Entrez le rythme de croissance  : ");
+                scanf("%f", &r);
+
+                simuler_dynamique(reseau, iterations, r);
+                break;
+
+            case 5:
                 printf("Au revoir !\n");
                 break;
 
             default:
-                printf("Choix invalide. Reessayez.\n");
+                printf("Choix invalide, reessayez.\n");
         }
-    } while (choix != 4);
+    } while (choix != 5);
 
     libererReseau(reseau);
     return 0;
 }
+END_OF_MAIN()
