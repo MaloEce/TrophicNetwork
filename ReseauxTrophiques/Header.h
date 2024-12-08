@@ -30,13 +30,13 @@ typedef struct {
 
 // Fonctions
 ReseauTrophique* chargerReseau(const char *nomFichier);
-void dfs(int sommet, int nbSommets, int *visites, Arc *arcs, int nbArcs, int direction);
-void verifierConnexiteEtFiltrer(ReseauTrophique *reseau);
-ReseauTrophique* filtrerComposante(ReseauTrophique *reseau, int *composante, int composanteId);
 void afficherReseau(ReseauTrophique *reseau);
 void sucpre(ReseauTrophique *reseau);
 void rechercherMaillons(ReseauTrophique *reseau, const char *type);
-void simulerDynamique(ReseauTrophique *reseau, int iterations);
+void unpre(ReseauTrophique *reseau);
+void dfsinverse(ReseauTrophique *reseau, int sommetActuel, int cible, int chemin[], int index);
+void toutpre(ReseauTrophique *reseau);
+void toutpre(ReseauTrophique *reseau);
 void libererReseau(ReseauTrophique *reseau);
 void afficherComplexite(ReseauTrophique *reseau);
 int calculerHauteurTrophique(ReseauTrophique *reseau);
