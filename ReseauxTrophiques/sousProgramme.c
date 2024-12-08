@@ -1,10 +1,5 @@
 #include "Header.h"
 
-// Fonction pour ignorer une ligne de commentaire dans le fichier
-void ignorerCommentaire(FILE *fichier) {
-    int c;
-    while ((c = fgetc(fichier)) != '\n' && c != EOF); // Avancer jusqu'à la fin de la ligne
-}
 
 // Charger le reseau trophique depuis un fichier
 ReseauTrophique* chargerReseau(const char *nomFichier) {
@@ -65,107 +60,6 @@ ReseauTrophique* chargerReseau(const char *nomFichier) {
     fclose(fichier);
     return reseau;
 }
-void dfs(int sommet, int nbSommets, int *visites, Arc *arcs, int nbArcs, int direction) {
-    visites[sommet] = 1;
-    for (int i = 0; i < nbArcs; i++) {
-        int voisin = (direction == 0) ? arcs[i].cible - 1 : arcs[i].source - 1;
-        if (((direction == 0 && arcs[i].source - 1 == sommet) ||
-             (direction == 1 && arcs[i].cible - 1 == sommet)) && !visites[voisin]) {
-            dfs(voisin, nbSommets, visites, arcs, nbArcs, direction);
-        }
-    }
-}
-void verifierConnexiteEtFiltrer(ReseauTrophique *reseau) {
-    int nbSommets = reseau->nbSommets;
-    int *visites = calloc(nbSommets, sizeof(int));
-    int *composante = calloc(nbSommets, sizeof(int));
-    int composanteId = 0;
-
-    // Identification des composantes fortement connexes
-    for (int i = 0; i < nbSommets; i++) {
-        if (!visites[i]) {
-            composanteId++;
-            dfs(i, nbSommets, visites, reseau->arcs, reseau->nbArcs, 0); // DFS dans une direction
-            for (int j = 0; j < nbSommets; j++) {
-                if (visites[j]) {
-                    composante[j] = composanteId;
-                    visites[j] = 0; // Réinitialiser pour exploration complète
-                }
-            }
-        }
-    }
-
-    printf("\nLe réseau a %d composante(s) fortement connexe(s) :\n", composanteId);
-    for (int i = 1; i <= composanteId; i++) {
-        printf("Composante %d : ", i);
-        for (int j = 0; j < nbSommets; j++) {
-            if (composante[j] == i) {
-                printf("[%d] %s, ", reseau->sommets[j].id, reseau->sommets[j].nom);
-            }
-        }
-        printf("\n");
-    }
-
-    // Si le réseau n'est pas connexe, proposer de choisir une composante
-    if (composanteId > 1) {
-        int choix;
-        printf("\nLe réseau n'est pas connexe. Choisissez une composante à étudier (1-%d) : ", composanteId);
-        scanf("%d", &choix);
-        if (choix < 1 || choix > composanteId) {
-            printf("Choix invalide. Retour au menu principal.\n");
-        } else {
-            // Filtrage de la composante choisie
-            ReseauTrophique *sousReseau = filtrerComposante(reseau, composante, choix);
-            printf("\nÉtude de la composante %d :\n", choix);
-            sucpre(sousReseau);
-            libererReseau(sousReseau);
-        }
-    } else {
-        printf("\nLe réseau est fortement connexe. Pas de filtration nécessaire.\n");
-    }
-
-    free(visites);
-    free(composante);
-}
-
-ReseauTrophique* filtrerComposante(ReseauTrophique *reseau, int *composante, int composanteId) {
-    int nbSommets = 0;
-    for (int i = 0; i < reseau->nbSommets; i++) {
-        if (composante[i] == composanteId) {
-            nbSommets++;
-        }
-    }
-
-    ReseauTrophique *sousReseau = malloc(sizeof(ReseauTrophique));
-    sousReseau->sommets = malloc(nbSommets * sizeof(Sommet));
-    sousReseau->arcs = malloc(reseau->nbArcs * sizeof(Arc));
-    sousReseau->nbSommets = 0;
-    sousReseau->nbArcs = 0;
-
-    int *nouveauxIds = malloc(reseau->nbSommets * sizeof(int));
-    for (int i = 0; i < reseau->nbSommets; i++) {
-        if (composante[i] == composanteId) {
-            sousReseau->sommets[sousReseau->nbSommets] = reseau->sommets[i];
-            nouveauxIds[reseau->sommets[i].id - 1] = sousReseau->nbSommets + 1;
-            sousReseau->nbSommets++;
-        }
-    }
-
-    for (int i = 0; i < reseau->nbArcs; i++) {
-        int source = reseau->arcs[i].source - 1;
-        int cible = reseau->arcs[i].cible - 1;
-        if (composante[source] == composanteId && composante[cible] == composanteId) {
-            sousReseau->arcs[sousReseau->nbArcs] = reseau->arcs[i];
-            sousReseau->arcs[sousReseau->nbArcs].source = nouveauxIds[source];
-            sousReseau->arcs[sousReseau->nbArcs].cible = nouveauxIds[cible];
-            sousReseau->nbArcs++;
-        }
-    }
-
-    free(nouveauxIds);
-    return sousReseau;
-}
-
 
 
 // Afficher le reseau trophique
@@ -194,6 +88,94 @@ void sucpre(ReseauTrophique *reseau) {
         printf("\n");
     }
 }
+void unpre(ReseauTrophique *reseau) {
+    printf("\n--- Especes n'ayant qu'une source d'alimentation ---\n");
+
+    for (int i = 0; i < reseau->nbSommets; i++) {
+        // Compter le nombre de prédécesseurs du sommet actuel
+        int nbPredecesseurs = 0;
+
+        for (int j = 0; j < reseau->nbArcs; j++) {
+            if (reseau->arcs[j].cible == reseau->sommets[i].id) {
+                nbPredecesseurs++;
+            }
+        }
+
+        // Afficher uniquement les sommets ayant exactement un prédécesseur
+        if (nbPredecesseurs == 1) {
+            printf("\nSommet [%d] %s (%s) :\n", reseau->sommets[i].id, reseau->sommets[i].nom, reseau->sommets[i].type);
+            printf("  Prédécesseur : ");
+
+            for (int j = 0; j < reseau->nbArcs; j++) {
+                if (reseau->arcs[j].cible == reseau->sommets[i].id) {
+                    printf("[%d] %s\n",
+                           reseau->arcs[j].source,
+                           reseau->sommets[reseau->arcs[j].source - 1].nom
+                    );
+                    break; // On affiche le seul prédécesseur trouvé
+                }
+            }
+        }
+    }
+}
+
+// Fonction DFS inversée pour explorer tous les chemins menant jusqu'à la cible
+void dfsInverse(ReseauTrophique *reseau, int sommetActuel, int chemin[], int index) {
+    chemin[index] = sommetActuel; // Enregistrer le sommet actuel dans le chemin
+
+    // Vérifier s'il existe des arcs menant à ce sommet
+    int trouvePred = 0;
+    for (int i = 0; i < reseau->nbArcs; i++) {
+        if (reseau->arcs[i].cible == sommetActuel) {
+            trouvePred = 1; // Un prédécesseur existe
+            dfsInverse(reseau, reseau->arcs[i].source, chemin, index + 1); // Continuer la recherche
+        }
+    }
+
+    // Afficher le chemin lorsque l'on remonte dans la récursion
+    if (!trouvePred) { // On est arrivé à une source sans prédécesseur
+        printf("\nChemin trouvé : ");
+        for (int i = index; i >= 0; i--) {
+            printf("%s", reseau->sommets[chemin[i] - 1].nom);
+            if (i > 0) printf(" -> ");
+        }
+        printf("\n");
+    }
+}
+
+// Sous-programme pour l'interface utilisateur
+void toutpre(ReseauTrophique *reseau) {
+    int sommetRecherche;
+    int chemin[100]; // Tableau pour sauvegarder le chemin actuel
+    int aDesPred = 0;
+
+    // Afficher la liste des sommets disponibles
+    printf("\nSommets disponibles dans le réseau trophique :\n");
+    for (int i = 0; i < reseau->nbSommets; i++) {
+        printf("[%d] %s (%s)\n", reseau->sommets[i].id, reseau->sommets[i].nom, reseau->sommets[i].type);
+    }
+
+    // Demander un sommet cible
+    printf("\nEntrez l'ID du sommet que vous souhaitez explorer : ");
+    scanf("%d", &sommetRecherche);
+    // Vérifier si le sommet a des prédécesseurs
+    for (int i = 0; i < reseau->nbArcs; i++) {
+        if (reseau->arcs[i].cible == sommetRecherche) {
+            aDesPred = 1;
+            break;
+        }
+    }
+
+    if (aDesPred==0) {
+        printf("\nLe sommet %s n'a aucun prédécesseur dans le réseau trophique.\n");
+    }
+    if (aDesPred==1) {
+        // Lancer la recherche inversée avec DFS
+        printf("\nExploration des chemins menant jusqu'à %s\n", reseau->sommets[sommetRecherche - 1].nom);
+        dfsInverse(reseau, sommetRecherche, chemin, 0);
+    }
+}
+
 void afficherReseau(ReseauTrophique *reseau) {
     printf("\n--- Réseau Trophique ---\n");
     printf("\nSommets :\n");
@@ -220,39 +202,6 @@ void rechercherMaillons(ReseauTrophique *reseau, const char *type) {
     }
 }
 
-// Simuler la dynamique des populations
-void simulerDynamique(ReseauTrophique *reseau, int iterations) {
-    printf("\nSimulation de la dynamique des populations sur %d iterations :\n", iterations);
-
-    for (int t = 0; t < iterations; t++) {
-        printf("\nIteration %d :\n", t + 1);
-
-        int *nouvellesBiomasses = malloc(reseau->nbSommets * sizeof(int));
-        for (int i = 0; i < reseau->nbSommets; i++) {
-            nouvellesBiomasses[i] = reseau->sommets[i].biomasse; // Copie
-        }
-
-        for (int i = 0; i < reseau->nbArcs; i++) {
-            Arc arc = reseau->arcs[i];
-            int source = arc.source - 1;
-            int cible = arc.cible - 1;
-
-            int transfert = (int)(reseau->sommets[source].biomasse * arc.poids);
-            nouvellesBiomasses[source] -= transfert;
-            nouvellesBiomasses[cible] += transfert;
-        }
-
-        for (int i = 0; i < reseau->nbSommets; i++) {
-            reseau->sommets[i].biomasse = nouvellesBiomasses[i];
-            printf("[%d] %s - Biomasse : %d\n",
-                   reseau->sommets[i].id,
-                   reseau->sommets[i].nom,
-                   reseau->sommets[i].biomasse);
-        }
-
-        free(nouvellesBiomasses);
-    }
-}
 void distributionDesDegres(ReseauTrophique *reseau) {
     int *degresEntrants = calloc(reseau->nbSommets, sizeof(int));
     int *degresSortants = calloc(reseau->nbSommets, sizeof(int));
