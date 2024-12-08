@@ -4,32 +4,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <allegro.h>
+#include <math.h>
 
-// Structure pour un sommet
+//ici nous definissons nos structures, nous avons les structures sommet comprenant les informations sur une espece
+//une struct Arcs, avec la cible et la source (oriente de la source a la cible) et sa ponderation, notre coefficient dinteraction
 typedef struct {
-    int id;             // ID unique du sommet
-    char nom[50];       // Nom de l'espece ou ressource
-    char type[20];      // Type : producteur, consommateur, decomposeur
-    int biomasse;       // Taille de la biomasse en kg
+    int id;
+    char nom[50];
+    char type[20];
+    int biomasse;
 } Sommet;
 
-// Structure pour un arc
+
 typedef struct {
-    int source;         // ID du sommet source
-    int cible;          // ID du sommet cible
-    float poids;        // Poids de la relation (proportion ou influence)
+    int source;
+    int cible;
+    float poids;
 } Arc;
 
-// Structure du reseau trophique
+//Ici nous avpons notre structure reseau, qui est defini par les structures vu precedement mais aussi le nombre total darcs et de sommet, pour ne pas avoir a passer ces variable partout, jai decider de la mettre dans le resau directement
+
 typedef struct {
-    Sommet *sommets;    // Liste des sommets
-    Arc *arcs;          // Liste des arcs
-    int nbSommets;      // Nombre total de sommets
-    int nbArcs;         // Nombre total d'arcs
+    Sommet *sommets;
+    Arc *arcs;
+    int nbSommets;
+    int nbArcs;
 } ReseauTrophique;
 
-// Fonctions
+// Fonctions sauf pour la simulation
 ReseauTrophique* chargerReseau(const char *nomFichier);
+void dfsComposante(ReseauTrophique *reseau, int sommet,  int composanteId, int *composantes);
+void connexite(ReseauTrophique **reseau);
 void afficherReseau(ReseauTrophique *reseau);
 void sucpre(ReseauTrophique *reseau);
 void rechercherMaillons(ReseauTrophique *reseau, const char *type);
@@ -42,6 +48,7 @@ void afficherComplexite(ReseauTrophique *reseau);
 int calculerHauteurTrophique(ReseauTrophique *reseau);
 double calculerDensite(ReseauTrophique *reseau);
 void distributionDesDegres(ReseauTrophique *reseau);
+void simuler_dynamique(ReseauTrophique *reseau, int iterations, float r);
 
 
 #endif
