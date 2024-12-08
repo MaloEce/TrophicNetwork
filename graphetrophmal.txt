@@ -1,0 +1,36 @@
+// Sommets : Liste des espèces
+// TYPE : producteur, consommateur primaire, secondaire, tertiaire, décomposeur
+// BIOMASSE : taille de la population ou biomasse estimée
+
+1 "Phytoplancton" producteur 40000       // Base de la chaîne alimentaire
+2 "Mangrove" producteur 80000           // Arbres des zones humides
+3 "Crevettes" consommateur 12000        // Consommateur primaire
+4 "Poisson-perroquet" consommateur 7000 // Consommateur primaire
+5 "Varan malais" consommateur 3000      // Prédateur opportuniste
+6 "Tigre de Malaisie" consommateur 500  // Prédateur apex
+7 "Crocodile d'estuaire" consommateur 100 // Prédateur apex des mangroves
+8 "Crabe des mangroves" filtreur 4000   // Dépend des détritus
+9 "Fouisseur marin" décomposeur 2000    // Recycler les nutriments
+10 "Champignons terrestres" décomposeur 5000 // Décomposeur en forêt
+11 "Dugong" consommateur 800            // Consommateur primaire d'herbes marines
+12 "Épervier de mer" consommateur 200   // Prédateur opportuniste, se nourrit de poissons et de crabes
+
+
+// Arcs : Relations entre les sommets
+// POIDS : influence (positive ou négative) ou proportion des ressources consommées
+
+1 3 0.6  // Phytoplancton consommé par les crevettes (60%)
+1 4 0.4  // Phytoplancton consommé par le poisson-perroquet (40%)
+2 8 0.7  // Débris de mangroves consommés par les crabes (70%)
+2 11 0.8 // Mangroves et herbes marines consommées par les dugongs (80%)
+3 5 -0.5 // Varans malais consomment les crevettes (50%)
+4 6 -0.3 // Tigres consomment occasionnellement les poissons (30%)
+4 12 -0.2 // Épervier chasse des poissons-perroquets (20%)
+5 6 -0.6 // Tigres de Malaisie chassent les varans (60%)
+7 5 -0.2 // Crocodiles consomment des varans (20%)
+6 10 0.3 // Tigres contribuent aux nutriments pour les champignons (30%)
+7 9 0.5 // Crocodiles nourrissent les fouisseurs marins via leurs débris (50%)
+9 2 0.2 // Décomposeurs recyclent les nutriments vers les mangroves
+10 2 0.3 // Champignons enrichissent les sols des mangroves
+11 9 0.4 // Débris des dugongs contribuent aux fouisseurs marins (40%)
+12 8 -0.3 // Épervier chasse les crabes des mangroves (30%)
