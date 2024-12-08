@@ -1,0 +1,41 @@
+// Sommets : Liste des espèces
+// TYPE : producteur, consommateur primaire, secondaire, tertiaire, décomposeur
+// BIOMASSE : taille de la population ou biomasse estimée
+
+
+1 "Chêne pédonculé" producteur 50000  // Base de la chaîne alimentaire
+2 "Bruyère" producteur 30000          // Plante ligneuse essentielle des landes
+3 "Fougère aigle" producteur 25000    // Plante dominante dans les sous-bois
+4 "Cerf élaphe" consommateur 1000     // Herbivore, consomme plantes et écorces
+5 "Chevreuil" consommateur 800        // Petit herbivore, consomme feuilles et jeunes pousses
+6 "Criquet" consommateur 500          // Insecte herbivore des prairies
+7 "Renard roux" consommateur 150      // Omnivore opportuniste
+8 "Vipère aspic" consommateur 50      // Prédateur de petits vertébrés
+9 "Pic épeiche" consommateur 100      // Insectivore, dépend des arbres
+10 "Buse variable" consommateur 20    // Prédateur de petits mammifères et reptiles
+11 "Grand murin" consommateur 30      // Chauve-souris insectivore
+12 "Lucane cerf-volant" décomposeur 200 // Coléoptère saproxylique
+13 "Trametes versicolor" décomposeur 400 // Champignon lignivore
+14 "Cloporte commun" décomposeur 300   // Recycler des matières végétales mortes
+
+
+// Arcs : Relations entre les sommets
+// POIDS : influence (positive ou négative) ou proportion des ressources consommées
+
+1 4 0.7   // Chêne nourrit le cerf élaphe (70%)
+1 5 0.6   // Chêne nourrit le chevreuil (60%)
+1 9 0.5   // Chêne abrite le pic épeiche (50%)
+2 6 0.8   // Bruyère consommée par le criquet (80%)
+3 5 0.4   // Fougère consommée par le chevreuil (40%)
+
+4 7 -0.3  // Cerf élaphe chassé par le renard roux (30%)
+5 7 -0.4  // Chevreuil chassé par le renard roux (40%)
+6 8 -0.5  // Criquet consommé par la vipère aspic (50%)
+9 7 -0.6  // Pic épeiche consommé par le renard roux (60%)
+10 8 -0.4 // Buse variable chasse la vipère aspic (40%)
+10 11 -0.3 // Buse variable consomme le grand murin (30%)
+
+12 14 0.5 // Cloporte recycle les matières lignifiées (50%)
+13 1 0.3  // Champignon décompose les matières du chêne (30%)
+13 3 0.2  // Champignon décompose les fougères mortes (20%)
+14 2 0.4  // Cloporte nourrit indirectement les bruyères (40%)
